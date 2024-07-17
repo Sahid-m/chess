@@ -34,6 +34,7 @@ export class GameManager{
                     this.pendindUser = null;
                 } else {
                     this.pendindUser = socket;
+                    socket.send('YOU ARE WAITING FOR A PLAYER')
                 }
             }
 

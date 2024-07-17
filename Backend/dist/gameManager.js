@@ -29,6 +29,7 @@ class GameManager {
                 }
                 else {
                     this.pendindUser = socket;
+                    socket.send('YOU ARE WAITING FOR A PLAYER');
                 }
             }
             if (message.type === messages_1.MOVE) {
