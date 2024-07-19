@@ -1,6 +1,6 @@
 import { WebSocket } from 'ws';
 import { Game } from './game';
-import { INIT_GAME, MOVE } from './messages';
+import { INIT_GAME, MOVE, WAITING } from './messages';
 
 export class GameManager{ 
     private games: Game[];
@@ -28,14 +28,25 @@ export class GameManager{
             const message = JSON.parse(data.toString());
 
             if (message.type === INIT_GAME) {
-                if (this.pendindUser) {
+
+                if (socket === this.pendindUser) {
+                    socket.send(JSON.stringify({
+                        "type": WAITING
+                    }))
+                } else {
+                    if (this.pendindUser) {
                     let game = new Game(this.pendindUser, socket);
                     this.games.push(game);
                     this.pendindUser = null;
                 } else {
                     this.pendindUser = socket;
-                    socket.send('YOU ARE WAITING FOR A PLAYER')
+                    socket.send(JSON.stringify({
+                        "type": WAITING
+                    }))
                 }
+                }
+
+                
             }
 
             if (message.type === MOVE) {

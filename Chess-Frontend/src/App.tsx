@@ -6,14 +6,14 @@ function App() {
 
 
   return (
-    <>
+    <div className="bg-cgray">
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/game" element={<GamePage />} />
         </Routes>
       </BrowserRouter>
-    </>
+    </div>
   )
 }
 

@@ -20,23 +20,19 @@ class Game {
     makeMove(socket, move) {
         // Check if valid player sends move
         if (this.MoveCounter % 2 === 0 && socket !== this.player1) {
-            socket.send("not your turn");
             return;
         }
         ;
         if (this.MoveCounter % 2 === 1 && socket !== this.player2) {
-            socket.send("not your turn");
             return;
         }
         ;
         // updates the board and add moves
         try {
             this.board.move(move);
-            socket.send("valid move");
         }
         catch (e) {
             console.log(e);
-            socket.send("invalid move");
             return;
         }
         // Checks if game over

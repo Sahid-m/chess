@@ -22,14 +22,23 @@ class GameManager {
         socket.on("message", (data) => {
             const message = JSON.parse(data.toString());
             if (message.type === messages_1.INIT_GAME) {
-                if (this.pendindUser) {
-                    let game = new game_1.Game(this.pendindUser, socket);
-                    this.games.push(game);
-                    this.pendindUser = null;
+                if (socket === this.pendindUser) {
+                    socket.send(JSON.stringify({
+                        "type": messages_1.WAITING
+                    }));
                 }
                 else {
-                    this.pendindUser = socket;
-                    socket.send('YOU ARE WAITING FOR A PLAYER');
+                    if (this.pendindUser) {
+                        let game = new game_1.Game(this.pendindUser, socket);
+                        this.games.push(game);
+                        this.pendindUser = null;
+                    }
+                    else {
+                        this.pendindUser = socket;
+                        socket.send(JSON.stringify({
+                            "type": messages_1.WAITING
+                        }));
+                    }
                 }
             }
             if (message.type === messages_1.MOVE) {
