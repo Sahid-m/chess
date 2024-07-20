@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.stroke-black {
+  filter: drop-shadow(2px 0 0 black) drop-shadow(0 2px 0 black)
+    drop-shadow(-2px 0 0 black) drop-shadow(0 -2px 0 black);
+}
+
+.stroke-white {
+  filter: drop-shadow(2px 0 0 white) drop-shadow(0 2px 0 white)
+    drop-shadow(-2px 0 0 white) drop-shadow(0 -2px 0 white);
+}

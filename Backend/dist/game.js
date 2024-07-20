@@ -11,9 +11,11 @@ class Game {
         this.board = new chess_js_1.Chess();
         this.startTime = new Date();
         this.player1.send(JSON.stringify({
+            type: messages_1.STARTED,
             color: "white",
         }));
         this.player2.send(JSON.stringify({
+            type: messages_1.STARTED,
             color: "black",
         }));
     }

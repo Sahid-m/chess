@@ -16,6 +16,8 @@ export default {
       bermuda: "#78dcca",
       cgreen: "#81b64c",
       cgray: "#312e2b",
+      "chess-green": "#739552",
+      "chess-whitish": "#EBECD0",
     },
     extend: {},
   },
