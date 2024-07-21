@@ -6,9 +6,9 @@ const gameManager = new GameManager();
 
 
 wss.on('connection', function connection(ws) {
-    gameManager.addUser(ws);
+    gameManager.addUser({socket: ws});
 
     ws.on("disconnect", () => {
-        gameManager.removeUser(ws);
+        gameManager.removeUser({socket: ws});
     })
 });

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { MOVE } from "./messages";
 
 
-export default function ChessBoard({ board, socket, setBoard, chess }: {
+export default function ChessBoard({ board, socket, setBoard, chess, turn, setTurn, gameOver, winner }: {
     chess: Chess;
     board: ({
         square: Square;
@@ -16,6 +16,10 @@ export default function ChessBoard({ board, socket, setBoard, chess }: {
         type: PieceSymbol;
         color: Color;
     } | null)[][]>>;
+    turn: boolean;
+    setTurn: React.Dispatch<React.SetStateAction<boolean>>;
+    gameOver: boolean;
+    winner: string | null;
 }) {
     const [from, setFrom] = useState<null | Square>(null);
 
@@ -30,9 +34,32 @@ export default function ChessBoard({ board, socket, setBoard, chess }: {
                             const squareRepresentation = String.fromCharCode(97 + (j % 8)) + "" + (8 - i) as Square;
 
                             return <div onClick={() => {
+
+                                if (gameOver) {
+                                    alert("Game Over! " + winner + " won");
+                                    return;
+                                }
+
+                                if (!turn) {
+                                    alert("Not Your Turn");
+                                    return;
+                                }
+
+
                                 if (!from) {
                                     setFrom(squareRepresentation);
                                 } else {
+                                    try {
+                                        chess.move({
+                                            from: from,
+                                            to: squareRepresentation
+                                        })
+
+                                    } catch (e) {
+                                        alert(e);
+                                        setFrom(null);
+                                        return;
+                                    }
                                     socket.send(JSON.stringify({
                                         type: MOVE,
                                         move: {
@@ -42,11 +69,8 @@ export default function ChessBoard({ board, socket, setBoard, chess }: {
                                     }))
 
                                     setFrom(null);
+                                    setTurn(false);
 
-                                    chess.move({
-                                        from: from,
-                                        to: squareRepresentation
-                                    })
 
 
                                     setBoard(chess.board());

@@ -2,45 +2,51 @@ import { WebSocket } from 'ws';
 import { Game } from './game';
 import { INIT_GAME, MOVE, WAITING } from './messages';
 
+export interface User{
+    socket: WebSocket;
+    name?: string;
+}
+
 export class GameManager{ 
     private games: Game[];
-    private pendindUser: WebSocket | null;
-    private users: WebSocket[];
+    private pendindUser: User | null;
+    private users: User[];
     constructor() {
         this.games = [];
         this.pendindUser = null;
         this.users = [];
     }
 
-    addUser(user: WebSocket) {
-        this.users.push(user);
+    addUser(user: User) {
+        this.users.push({ socket: user.socket});
         this.addHandler(user);
     }
 
-    removeUser(Socket: WebSocket) {
+    removeUser(Socket: User) {
         this.users = this.users.filter((user) => {
-            user !== Socket;
+            user.socket !== Socket.socket;
         })
     }
 
-    private addHandler(socket: WebSocket) {
-        socket.on("message", (data) => {
+    private addHandler(user: User) {
+        user.socket.on("message", (data) => {
             const message = JSON.parse(data.toString());
 
             if (message.type === INIT_GAME) {
 
-                if (socket === this.pendindUser) {
-                    socket.send(JSON.stringify({
+                if (user.socket === this.pendindUser?.socket) {
+                    user.socket.send(JSON.stringify({
                         "type": WAITING
                     }))
                 } else {
                     if (this.pendindUser) {
-                    let game = new Game(this.pendindUser, socket);
+                        user.name = message.payload.name;
+                    let game = new Game(this.pendindUser, user);
                     this.games.push(game);
                     this.pendindUser = null;
                 } else {
-                    this.pendindUser = socket;
-                    socket.send(JSON.stringify({
+                    this.pendindUser = {socket: user.socket,name: message.payload.name};
+                    user.socket.send(JSON.stringify({
                         "type": WAITING
                     }))
                 }
@@ -51,11 +57,11 @@ export class GameManager{
 
             if (message.type === MOVE) {
                 const game = this.games.find((game) => {
-                    return game.player1 === socket || game.player2 === socket; 
+                    return game.player1.socket === user.socket || game.player2.socket === user.socket; 
                 })
 
                 if (game) {
-                    game.makeMove(socket, message.move);
+                    game.makeMove(user.socket, message.move);
                 }
             }
         })

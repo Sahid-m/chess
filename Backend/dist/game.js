@@ -10,22 +10,24 @@ class Game {
         this.player2 = player2;
         this.board = new chess_js_1.Chess();
         this.startTime = new Date();
-        this.player1.send(JSON.stringify({
+        this.player1.socket.send(JSON.stringify({
             type: messages_1.STARTED,
             color: "white",
+            name: this.player2.name
         }));
-        this.player2.send(JSON.stringify({
+        this.player2.socket.send(JSON.stringify({
             type: messages_1.STARTED,
             color: "black",
+            name: this.player1.name
         }));
     }
     makeMove(socket, move) {
         // Check if valid player sends move
-        if (this.MoveCounter % 2 === 0 && socket !== this.player1) {
+        if (this.MoveCounter % 2 === 0 && socket !== this.player1.socket) {
             return;
         }
         ;
-        if (this.MoveCounter % 2 === 1 && socket !== this.player2) {
+        if (this.MoveCounter % 2 === 1 && socket !== this.player2.socket) {
             return;
         }
         ;
@@ -39,31 +41,37 @@ class Game {
         }
         // Checks if game over
         if (this.board.isGameOver()) {
-            this.player1.send(JSON.stringify({
+            this.player1.socket.send(JSON.stringify({
                 type: messages_1.GAME_OVER,
                 payload: {
-                    winner: this.board.turn() === 'w' ? 'black' : 'white',
+                    winner: this.board.turn() === 'w' ? this.player2.name : this.player1.name,
                 }
             }));
-            this.player2.send(JSON.stringify({
+            this.player2.socket.send(JSON.stringify({
                 type: messages_1.GAME_OVER,
                 payload: {
-                    winner: this.board.turn() === 'w' ? 'black' : 'white',
+                    winner: this.board.turn() === 'w' ? this.player2.name : this.player1.name,
                 }
             }));
             return;
         }
         // Sends Move to users
         if (this.MoveCounter % 2 === 0) {
-            this.player2.send(JSON.stringify({
+            this.player2.socket.send(JSON.stringify({
                 type: messages_1.MOVE,
-                payload: move
+                payload: {
+                    move: move,
+                    turn: true
+                }
             }));
         }
         else {
-            this.player1.send(JSON.stringify({
+            this.player1.socket.send(JSON.stringify({
                 type: messages_1.MOVE,
-                payload: move
+                payload: {
+                    move: move,
+                    turn: true
+                }
             }));
         }
         this.MoveCounter++;
